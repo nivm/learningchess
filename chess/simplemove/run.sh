@@ -1,0 +1,1 @@
+cat ../../data/IB1419.pgn | python ../process_data.py | python simplemove.py | python movediff.py | sort | uniq -c > ../../data/results/simplemove/results.csv
