@@ -36,7 +36,7 @@ piece from_grid_cordients  to_grid_cordients
 Example:
 
 
-*. movediff.py -  
+*. movediff.py -  Calculate the difference in x,y axis of the move. I.e. pawn moving from c3->c4 would result - pawn 0 1
 
 
 Results
