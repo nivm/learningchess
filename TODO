@@ -1,0 +1,13 @@
+Test sets  - board1 board2
+(nb1, nb2) in list ~ 10^80
+
+1. Test Set, Interface Rule engine -
+Is this a move that this piece can do.
+2. Histogram moves pieces- SVM, regression 
+Functions/ rule base
+3. Number of changes in a board
+4. Condtinal Movement - Knight
+5. Check/ Checkmate - King
+
+
+
