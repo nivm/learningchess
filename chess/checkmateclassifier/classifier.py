@@ -220,8 +220,8 @@ def main():
 
 
 if __name__ == '__main__':
-    path = "/home/taykey/code/learningchess/data/results/checkmateclassifier/results2/"
-    sys.argv.append("--dataset-f="+path+"input_big_30k_features.tsv")
+    path = "/home/taykey/code/learningchess/data/results/checkmateclassifier/results4/"
+    sys.argv.append("--dataset-f="+path+"input_10k_features.tsv")
     sys.argv.append("--false-predifction-f="+path+"false_predictions_f.tsv")
     sys.argv.append("--unknown-predictions-f="+path+"unknown_predictions_f.tsv")
     sys.argv.append("--confusion-matrices-dir="+path+"classifier")

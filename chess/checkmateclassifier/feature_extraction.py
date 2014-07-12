@@ -3,27 +3,6 @@ from collections import defaultdict
 import re
 import chess
 
-def print_game(game):
-	'''
-	print Game data and moves
-	'''
-	game = " ".join(game)
-	game = re.sub("\d+\.", " ", game).strip()
-	moves = re.split("\s+", game)
-	board = chess.Bitboard()
-	
-	end = moves[-1]
-	moves = moves[:-1]
-	
-	after_str = str(board)
-	for move in moves:
-		mv = board.push_san(move)
-		after_str = str(board)
-		# Piece that moved
-		#piece = board.piece_at(mv.to_square)
-		
-		sys.stdout.write("%s\t%s\t%s\t%s\n"%(after_str, board.is_game_over(), board.is_checkmate(), board.is_stalemate()))
-
 def fen_to_piece_placement_array(fen):
 	piece_placement = fen.split()[0]
 	piece_placement_array = [list(line) for line in piece_placement.split("/")]
@@ -42,16 +21,66 @@ def fen_to_piece_placement_array(fen):
 
 def get_count_features(piece_placement_array):
 	counters = defaultdict(int)
-	for row in piece_placement_array:
-		for piece in row:
+	pieces= set()
+	for i,row in enumerate(piece_placement_array):
+		for j,piece in enumerate(row):
 			counters["total"] += int(piece!=0)
-			if piece!= 0:
-				piece_lower = piece.lower()
-				counters["white"] += piece_lower != piece
-				counters["black"] += piece_lower == piece
-				counters["single_side_"+piece]+=1
-				counters[piece_lower]+=1
+			if piece== 0:
+				continue
+			piece_lower = piece.lower()
+			#black is lower case
+			is_white = piece_lower != piece
+			counters["white"] += int(is_white)
+			counters["black"] += int(not is_white)
+			counters["single_side_"+piece]+=1
+			counters[piece_lower]+=1
+			if piece_lower in ["p"]:
+				continue
+			pieces.add(piece)
+			#"king or a queen"
+			for k in xrange(max(0,i-3), min(i+4,8)):
+				for l in xrange(max(0,j-3), min(j+4,8)):
+					if k == i and j == l:
+						continue
+					other_piece = piece_placement_array[k][l]
+					if other_piece == 0:
+						counters["single_side_"+piece+"_empty"]+=1
+						continue
+					is_other_white = other_piece != other_piece.lower() 
+					
+					
+					counters["single_side_"+piece+"_same_side"]+= int(is_white == is_other_white)
+					counters["single_side_"+piece+"_other_side"]+= int(is_white != is_other_white)
+
+	for piece in pieces:
+		if "single_side_"+piece not in counters:
+			continue
+		other_side = counters["single_side_"+piece+"_other_side"]
+		same_side = counters["single_side_"+piece+"_same_side"]
+		empty = counters["single_side_"+piece+"_empty"]
+		counters["single_side_"+piece+"_threat"] = 1+int(other_side >= same_side  )
+		counters["single_side_"+piece+"_mostly_empty"] = 1+int(empty >  other_side + same_side)
+		counters["single_side_"+piece+"_mostly_more_empty_than_good"] = 1+int(empty >  same_side)
+		counters["single_side_"+piece+"_mostly_more_empty_than_bad"] = 1+int(empty >  other_side)
+		counters["single_side_"+piece+"_other_side_exist"] = 1+int(other_side > 0)
 	return counters
+
+def get_feature_headers():
+	general= ["total","white","black"]
+	pieces= ["b","k","n","p","q","r"]
+	single_side_features = []
+	for piece in pieces:
+		for p  in [piece, piece.upper()]:
+			single_side_features.append("single_side_" + p)
+			single_side_features.append("single_side_"+p+"_empty")
+			single_side_features.append("single_side_"+p+"_same_side")
+			single_side_features.append("single_side_"+p+"_other_side")
+			single_side_features.append("single_side_"+p+"_threat")
+			single_side_features.append("single_side_"+p+"_mostly_empty")
+			single_side_features.append("single_side_"+p+"_mostly_more_empty_than_good")
+			single_side_features.append("single_side_"+p+"_mostly_more_empty_than_bad")
+			single_side_features.append("single_side_"+p+"_other_side_exist")
+	return general + pieces + single_side_features
 
 def main(argv):
 	'''
@@ -61,7 +90,7 @@ def main(argv):
 	'''
 	game_start = False
 	
-	features_headers= ["total","white","black","b","k","n","p","q","r","single_side_b","single_side_B","single_side_k","single_side_K","single_side_n","single_side_N","single_side_p","single_side_P","single_side_q","single_side_Q","single_side_r","single_side_R"]
+	features_headers= get_feature_headers()
 	print "fen\t"+"\t".join(features_headers) + "\tis_game_over\tis_checkmate\tis_stalemate" 
 	for line in sys.stdin:
 		fen, results = line.strip().split("\t",1)
