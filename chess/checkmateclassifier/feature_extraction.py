@@ -44,25 +44,29 @@ def get_count_features(piece_placement_array):
 						continue
 					other_piece = piece_placement_array[k][l]
 					if other_piece == 0:
-						counters["single_side_"+piece+"_empty"]+=1
+						for d in range(1,4):
+							if  i-d <= k <= i +d and  j-d <= l <= j+d:
+								counters["single_side_"+piece+"_empty_"+str(d)]+=1
 						continue
 					is_other_white = other_piece != other_piece.lower() 
 					
-					
-					counters["single_side_"+piece+"_same_side"]+= int(is_white == is_other_white)
-					counters["single_side_"+piece+"_other_side"]+= int(is_white != is_other_white)
+					for d in range(1,4):
+						if  i-d <= k <= i +d and  j-d <= l <= j+d:
+							counters["single_side_"+piece+"_same_side_"+str(d)]+= int(is_white == is_other_white)
+							counters["single_side_"+piece+"_other_side_"+str(d)]+= int(is_white != is_other_white)
 
 	for piece in pieces:
 		if "single_side_"+piece not in counters:
 			continue
-		other_side = counters["single_side_"+piece+"_other_side"]
-		same_side = counters["single_side_"+piece+"_same_side"]
-		empty = counters["single_side_"+piece+"_empty"]
-		counters["single_side_"+piece+"_threat"] = 1+int(other_side >= same_side  )
-		counters["single_side_"+piece+"_mostly_empty"] = 1+int(empty >  other_side + same_side)
-		counters["single_side_"+piece+"_mostly_more_empty_than_good"] = 1+int(empty >  same_side)
-		counters["single_side_"+piece+"_mostly_more_empty_than_bad"] = 1+int(empty >  other_side)
-		counters["single_side_"+piece+"_other_side_exist"] = 1+int(other_side > 0)
+		for d in range(1,4):
+			other_side_d = counters["single_side_"+piece+"_other_side_"+str(d)]
+			same_side_d = counters["single_side_"+piece+"_same_side_"+str(d)]
+			empty_d = counters["single_side_"+piece+"_empty_"+str(d)]
+			counters["single_side_"+piece+"_threat_"+str(d)] = 1+int(other_side_d >= same_side_d  )
+			counters["single_side_"+piece+"_mostly_empty_"+str(d)] = 1+int(empty_d >  other_side_d + same_side_d)
+			counters["single_side_"+piece+"_mostly_more_empty_than_good_"+str(d)] = 1+int(empty_d >  same_side_d)
+			counters["single_side_"+piece+"_mostly_more_empty_than_bad_"+str(d)] = 1+int(empty_d >  other_side_d)
+			counters["single_side_"+piece+"_other_side_exist_"+str(d)] = 1+int(other_side_d > 0)
 	return counters
 
 def get_feature_headers():
@@ -72,14 +76,15 @@ def get_feature_headers():
 	for piece in pieces:
 		for p  in [piece, piece.upper()]:
 			single_side_features.append("single_side_" + p)
-			single_side_features.append("single_side_"+p+"_empty")
-			single_side_features.append("single_side_"+p+"_same_side")
-			single_side_features.append("single_side_"+p+"_other_side")
-			single_side_features.append("single_side_"+p+"_threat")
-			single_side_features.append("single_side_"+p+"_mostly_empty")
-			single_side_features.append("single_side_"+p+"_mostly_more_empty_than_good")
-			single_side_features.append("single_side_"+p+"_mostly_more_empty_than_bad")
-			single_side_features.append("single_side_"+p+"_other_side_exist")
+			for d in range(1,4):
+				single_side_features.append("single_side_"+p+"_empty_"+str(d))
+				single_side_features.append("single_side_"+p+"_same_side_"+str(d))
+				single_side_features.append("single_side_"+p+"_other_side_"+str(d))
+				single_side_features.append("single_side_"+p+"_threat_"+str(d))
+				single_side_features.append("single_side_"+p+"_mostly_empty_"+str(d))
+				single_side_features.append("single_side_"+p+"_mostly_more_empty_than_good_"+str(d))
+				single_side_features.append("single_side_"+p+"_mostly_more_empty_than_bad_"+str(d))
+				single_side_features.append("single_side_"+p+"_other_side_exist_"+str(d))
 	return general + pieces + single_side_features
 
 def main(argv):
