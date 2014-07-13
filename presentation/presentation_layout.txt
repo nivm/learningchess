@@ -1,0 +1,49 @@
+Slide 1 - Learning chess from data
+Niv Mizrahi, Tom Ron (should we inlcude refernce to Taykey?)
+Link to git repository 
+
+Part 1 - Defining the problem, why is it interesting
+
+* Defining the problem - can a computer learn chess just by analyzing Chess games?
+   - Peeling of \ abstracting chess -
+      - 2 parties - one winner or tie
+      - Given set of pieces
+      - Allowed movements
+
+* Problem 1 - Given a board state is a possible move legal (legal, not worthy)
+
+* Problem 2 - Given a board state is it Chess \ Chess mate?
+
+* Why is it interesting - 
+- Machine learning side - classifying based only on positive examples.
+- Techincal side - combining several Python packages together. The whole is greater than its parts...
+
+
+Part 2 - Techinicalities 
+
+Dataset - Chess game based on algebric chess notation.
+   http://en.wikipedia.org/wiki/Algebraic_notation_(chess)
+   - X games - out of them A ended with white win, B with black win, C with tie, D didn't end (maybe pie chart)
+   - Y moves in all games together, add moves distribution chart by Piece \ party
+   - Out of Y board states - U where chess, W where chess mate (interesting numbers - U/Y, W/Y, W/U)
+
+Stack - (all references to python packages should include relevant links)
+   - Chess - https://pypi.python.org/pypi/python-chess
+   - PyLab - SciPy, Numpy, Matploblib - http://wiki.scipy.org/PyLab
+
+Chessmate -
+   - Features - describe each feature
+   - Describe distribution of each feaure
+   - Results
+
+Moves - 
+  - Conditional move, etc...
+
+Part 3 - Future
+
+Future -
+* How can we improve the results
+* Scaling
+* What it says about the world? 
+
+End slide - thank you, questions, etc
