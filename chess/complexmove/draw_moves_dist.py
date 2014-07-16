@@ -75,7 +75,8 @@ def surrounds_histograms(surrounds_data):
 		elements = surround.split(";")
 		for i in xrange(0, len(elements)):
 			histogram[i][elements[i]]+=count
-	histogram = {k : dict(v) for k,v in histogram.iteritems() if len(v)==1 and k!=4}
+	histogram = {k : dict(v) for k,v in histogram.iteritems() if k!=4}
+	#histogram = {k : dict(v) for k,v in histogram.iteritems() if len(v)==1 and k!=4}	
 	return histogram
 
 def rotate_surround(surround):
@@ -95,7 +96,12 @@ def group_by_histograms(histograms):
 	histogram_groups = defaultdict(lambda: defaultdict(list))
 	for piece, diffs in histograms.iteritems():
 		for (x,y), histogram in diffs.iteritems():
-			histogram_groups[piece][tuple(histogram.keys())].append((x,y))
+			
+			count = set(itertools.chain(*[k.values() for k in histogram.values()])).pop()
+			# Random threshold
+			if count < 10:
+				continue
+			histogram_groups[piece][tuple(histogram.keys())].append(((x,y),count))
 	return histogram_groups
 
 def main():
@@ -134,20 +140,20 @@ def main():
 
 	histograms = defaultdict(lambda: defaultdict(dict))
 	for piece in chess_pieces_move_dict:
-		for x,y in chess_pieces_move_dict[piece]:
-			#if x <= 1 and x >= -1 and y <= 1 and y >= -1:
-			#	continue
-			histograms[piece][(x,y)] = surrounds_histograms(chess_pieces_move_dict[piece][(x,y)])
+		for x,y in chess_pieces_move_dict[piece]:			
+			histogram = surrounds_histograms(chess_pieces_move_dict[piece][(x,y)])
+			if histogram:
+				histograms[piece][(x,y)] = histogram
 
 	histogram_groups = group_by_histograms(histograms)
 	for piece, piece_groups in histogram_groups.iteritems():
-		print piece
 		for group, moves in piece_groups.iteritems():
-			print '\t',group,'\t',moves
-	'''
-	if histogram:
-		print piece,"\t",x,y,'\t', histogram
-	'''
+			print piece,'\t',group,'\t',moves
+	
+	print '\n\n\n'
+	for piece, diffs in histograms.iteritems():
+		for (x,y), histogram in diffs.iteritems():
+			print piece,'\t',(x,y),'\t',histogram
 	#draw_charts(chess_pieces_move_dict)
 	#draw_overall_chart(chess_pieces_move_dict)
 
