@@ -2,8 +2,8 @@ import sys
 import re
 from collections import defaultdict
 import itertools
+from math import sqrt
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 pieces_hash = {"r": "rook", "k": "king", "q": "queen", "b" : "bishop", \
@@ -78,6 +78,26 @@ def surrounds_histograms(surrounds_data):
 	histogram = {k : dict(v) for k,v in histogram.iteritems() if len(v)==1 and k!=4}
 	return histogram
 
+def rotate_surround(surround):
+	'''
+	Rotate surrond so white surround and black
+	surround would act the same
+	'''
+	surround = surround.split(";")
+	n = int(sqrt(len(surround)))
+	surround = [surround[i:i+n] for i in xrange(0, n*n,n)]
+	surround = [reversed(z) for z in reversed(surround)]
+	surround = list(itertools.chain(*surround))
+	surround = ";".join(surround)
+	return surround
+
+def group_by_histograms(histograms):
+	histogram_groups = defaultdict(lambda: defaultdict(list))
+	for piece, diffs in histograms.iteritems():
+		for (x,y), histogram in diffs.iteritems():
+			histogram_groups[piece][tuple(histogram.keys())].append((x,y))
+	return histogram_groups
+
 def main():
 	'''
 	Draw a histogram of the relative movments of the pieces
@@ -86,35 +106,48 @@ def main():
 	chess_pieces_move_dict = {}
 	#
 	for line in sys.stdin:
-		count, piece, x,y, surround = re.split("\s", line.strip())
+		fields = re.split("\t", line.strip())
+		if len(fields)==3:
+			piece, x,y = fields
+		elif len(fields)==4:
+			piece, x,y, surround = fields
 		x = int(x)
 		y = int(y)
-		count = int(count)
 
-		# piece is in lower case to ignore black \ white differences
+		# Adjust black and white behaviour
 		if piece.lower() != piece:
 			x = -x
 			y = -y
-			surround = surround.split(";")
-			surround = [surround[:3],surround[3:6],surround[6:]]
-			surround = [reversed(z) for z in reversed(surround)]
-			surround = list(itertools.chain(*surround))
-			surround = ";".join(surround)
+			if surround:
+				surround = rotate_surround(surround)
+		
 		if piece.lower() not in chess_pieces_move_dict:
-			chess_pieces_move_dict[piece.lower()] = defaultdict(lambda : defaultdict(int))
-		chess_pieces_move_dict[piece.lower()][(x,y)][surround]+= count
+			if surround:
+				chess_pieces_move_dict[piece.lower()] = \
+				defaultdict(lambda : defaultdict(int))
+			else:
+				chess_pieces_move_dict[piece.lower()]= defaultdict[(x,y)]
+		if surround:
+			chess_pieces_move_dict[piece.lower()][(x,y)][surround]+= 1
+		else:
+			chess_pieces_move_dict[piece.lower()][(x,y)]+= 1
+
+	histograms = defaultdict(lambda: defaultdict(dict))
 	for piece in chess_pieces_move_dict:
-		print piece
 		for x,y in chess_pieces_move_dict[piece]:
 			#if x <= 1 and x >= -1 and y <= 1 and y >= -1:
 			#	continue
-			histogram = surrounds_histograms(chess_pieces_move_dict[piece][(x,y)])
-			if histogram:
-				print "\t",x,y,'\t', histogram
-			'''
-			for surround in chess_pieces_move_dict[piece][(x,y)]:
-				print "\t\t",surround,'\t',chess_pieces_move_dict[piece][(x,y)][surround]
-			'''
+			histograms[piece][(x,y)] = surrounds_histograms(chess_pieces_move_dict[piece][(x,y)])
+
+	histogram_groups = group_by_histograms(histograms)
+	for piece, piece_groups in histogram_groups.iteritems():
+		print piece
+		for group, moves in piece_groups.iteritems():
+			print '\t',group,'\t',moves
+	'''
+	if histogram:
+		print piece,"\t",x,y,'\t', histogram
+	'''
 	#draw_charts(chess_pieces_move_dict)
 	#draw_overall_chart(chess_pieces_move_dict)
 
