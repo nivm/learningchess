@@ -75,8 +75,8 @@ def surrounds_histograms(surrounds_data):
 		elements = surround.split(";")
 		for i in xrange(0, len(elements)):
 			histogram[i][elements[i]]+=count
-	histogram = {k : dict(v) for k,v in histogram.iteritems() if k!=4}
-	#histogram = {k : dict(v) for k,v in histogram.iteritems() if len(v)==1 and k!=4}	
+	#histogram = {k : dict(v) for k,v in histogram.iteritems() if k!=4}
+	histogram = {k : dict(v) for k,v in histogram.iteritems() if len(v)==1 and k!=4}	
 	return histogram
 
 def rotate_surround(surround):
@@ -96,12 +96,13 @@ def group_by_histograms(histograms):
 	histogram_groups = defaultdict(lambda: defaultdict(list))
 	for piece, diffs in histograms.iteritems():
 		for (x,y), histogram in diffs.iteritems():
-			
-			count = set(itertools.chain(*[k.values() for k in histogram.values()])).pop()
-			# Random threshold
+			count = list(itertools.chain(*[k.values() for k in histogram.values() \
+				if len(k)==1]))[0]
 			if count < 10:
 				continue
-			histogram_groups[piece][tuple(histogram.keys())].append(((x,y),count))
+			keys = tuple(sorted(histogram.keys()))
+			values = tuple([histogram[k].keys()[0] for k in keys])
+			histogram_groups[piece][keys].append(((x,y),count, values))
 	return histogram_groups
 
 def main():
