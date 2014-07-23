@@ -46,9 +46,7 @@ for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]:
 ####Explenation/ Example about First Degree
 for example for X == Q ( White Queen):
 
-q	0	n<br>
-P	\<X==Q\>	0<br>
-R	0	0<br>
+![Features for White Queen](img/first_degree.png)
 
 single_side_Q_empty_1 = 4<br>
 single_side_Q_same_side_1 = 2<br>
@@ -79,12 +77,7 @@ For example for X == Q ( White Queen):
 
 Example for 2 degree ( were the cartesian distance is smaller than 3 ):
 
-
-0	0	0	0	0<br>
-0	0	0	n	0<br>
-q	P	\<Q\>	0	0<br>
-0	0	B	0	0<br>
-0	0	0	0	N<br>
+![Features for White Queen](img/secondDegree.png)
 <br>
 single_side_Q_empty_1 = 5<br>
 single_side_Q_same_side_1 = 2<br>
@@ -96,13 +89,7 @@ single_side_Q_other_side_2 = 2<br>
 
 Example for 3 degree:
 
-0	0	0	0	0	0	0<br>
-0	0	0	0	0	0	0<br>
-0	0	0	0	n	0	0<br>
-r	q	P	\<Q\>	0	0	0<br>
-r	0	0	B	0	0	0<br>
-0	0	0	0	0	N	0<br>
-0	0	0	0	0	0	0<br>
+![Features for White Queen](img/thirdDegree.png)
 <br>
 single_side_Q_empty_1 = 5<br>
 single_side_Q_same_side_1 = 2<br>
