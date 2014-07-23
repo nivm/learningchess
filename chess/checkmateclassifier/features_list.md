@@ -12,53 +12,119 @@ The Results directory describe which set of features and set of input was used.
 ##Feature Description
 ###Simple count features
 
-+ total
-+ white
-+ black
-+ b
-+ k
-+ n
-+ p
-+ q
-+ r
++ total - The total amount of pieces on the board
++ white - The total amount of Upper case pieces on the board (white pieces) 
++ black - The total amount of Upper case pieces on the board (white pieces)
++ b 	- The total amount of "b" pieces (case insensetive) on the board (Bishop pieces from both side)
++ k 	- The total amount of "k" pieces (case insensetive) on the board (King pieces from both side)
++ n 	- The total amount of "n" pieces (case insensetive) on the board (kNight pieces from both side)
++ p 	- The total amount of "p" pieces (case insensetive) on the board (Pawn pieces from both side)
++ q 	- The total amount of "q" pieces (case insensetive) on the board (Queen pieces from both side)
++ r 	- The total amount of "r" pieces (case insensetive) on the board (Rock pieces from both side)
 
 for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]:
-+ single_side_<X>
++ single_side_\<X\> 	- The total amount of \<X\> pieces on the board (case sensetive - count for each side sepereatly)
 
 
 ###First Degree Neighbors
 
 for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]: 
-+ single_side_<X>_empty_1
-+ single_side_<X>_same_side_1
-+ single_side_<X>_other_side_1
-+ single_side_<X>_threat_1
-+ single_side_<X>_mostly_empty_1
-+ single_side_<X>_mostly_more_empty_than_good_1
-+ single_side_<X>_mostly_more_empty_than_bad_1
-+ single_side_<X>_other_side_exist_1
++ single_side_\<X\>_empty_1 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 2 )
++ single_side_\<X\>_same_side_1 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 2 )
++ single_side_\<X\>_other_side_1 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 2 )
+
+Calculated Boolean features from other features
+for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]:
++ single_side_\<X\>_threat_1 	- single_side_\<X\>_same_side_1 > single_side_\<X\>_other_side_1 
++ single_side_\<X\>_mostly_empty_1 	- single_side_\<X\>_empty_1 > ( single_side_\<X\>_same_side_1 + single_side_\<X\>_other_side_1 )
++ single_side_\<X\>_mostly_more_empty_than_good_1 	- single_side_\<X\>_empty_1 > single_side_\<X\>_same_side_1
++ single_side_\<X\>_mostly_more_empty_than_bad_1 	- single_side_\<X\>_empty_1 > single_side_\<X\>_other_side_1
++ single_side_\<X\>_other_side_exist_1 	- single_side_\<X\>_other_side_1
+
+
+####Explenation/ Example about First Degree
+for example for X == Q ( White Queen):
+
+q	0	n
+P	<X==Q>	0
+R	0	0
+
+single_side_Q_empty_1 = 4
+single_side_Q_same_side_1 = 2
+single_side_Q_other_side_1 = 2
+
+#####Commnets:
++ The edge of the board is not counted.
++ Two pieces from the same type and side are aggregated into one feature. -  This comment is not intuative and might be better if this calculation was made for each piece, and an aggregation would occur on the calculated features. ammount of pieces in thread and so on ...
+
 
 
 ###First to Third Degree Neighbors
 
-for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]:
-+ single_side_<X>_empty_2
-+ single_side_<X>_same_side_2
-+ single_side_<X>_other_side_2
-+ single_side_<X>_threat_2
-+ single_side_<X>_mostly_empty_2
-+ single_side_<X>_mostly_more_empty_than_good_2
-+ single_side_<X>_mostly_more_empty_than_bad_2
-+ single_side_<X>_other_side_exist_2
-+ single_side_<X>_empty_3
-+ single_side_<X>_same_side_3
-+ single_side_<X>_other_side_3
-+ single_side_<X>_threat_3
-+ single_side_<X>_mostly_empty_3
-+ single_side_<X>_mostly_more_empty_than_good_3
-+ single_side_<X>_mostly_more_empty_than_bad_3
-+ single_side_<X>_other_side_exist_3
+This Features are very similar to the First Degree Neighbors
 
+for each X in [b,k,n,p,q,r,B,K,N,P,Q,R]:
++ single_side_\<X\>_empty_2 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 3 )
++ single_side_\<X\>_same_side_2 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 3 )
++ single_side_\<X\>_other_side_2 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 3 )
+
++ single_side_\<X\>_empty_3 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 4 )
++ single_side_\<X\>_same_side_3 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 4 )
++ single_side_\<X\>_other_side_3 	- The amount of empty pieces around the \<X\> piece ( were the cartesian distance is smaller than 4 )
+
+
+####Explenation/ Example about First Degree
+For example for X == Q ( White Queen):
+
+Example for 2 degree ( were the cartesian distance is smaller than 3 ):
+
+
+0	0	0	0	0
+0	0	0	n	0
+q	P	<Q>	0	0
+0	0	B	0	0
+0	0	0	0	N
+
+single_side_Q_empty_1 = 5
+single_side_Q_same_side_1 = 2
+single_side_Q_other_side_1 = 1
+single_side_Q_empty_2 = 19
+single_side_Q_same_side_2 = 3
+single_side_Q_other_side_2 = 2
+
+
+Example for 3 degree:
+
+0	0	0	0	0	0	0
+0	0	0	0	0	0	0
+0	0	0	0	n	0	0
+r	q	P	<Q>	0	0	0
+r	0	0	B	0	0	0
+0	0	0	0	0	N	0
+0	0	0	0	0	0	0
+
+single_side_Q_empty_1 = 5
+single_side_Q_same_side_1 = 2
+single_side_Q_other_side_1 = 1
+single_side_Q_empty_2 = 19
+single_side_Q_same_side_2 = 3
+single_side_Q_other_side_2 = 2
+single_side_Q_empty_3 = 41
+single_side_Q_same_side_3 = 3
+single_side_Q_other_side_3 = 4
+
+
+Calculated Boolean features from other features
++ single_side_\<X\>_threat_2
++ single_side_\<X\>_mostly_empty_2
++ single_side_\<X\>_mostly_more_empty_than_good_2
++ single_side_\<X\>_mostly_more_empty_than_bad_2
++ single_side_\<X\>_other_side_exist_2
++ single_side_\<X\>_threat_3
++ single_side_\<X\>_mostly_empty_3
++ single_side_\<X\>_mostly_more_empty_than_good_3
++ single_side_\<X\>_mostly_more_empty_than_bad_3
++ single_side_\<X\>_other_side_exist_3
 
 
 ###Full Feature List
